@@ -1,6 +1,9 @@
 #!/bin/sh
 USER_ID=$(id -u)
-if [ ${USER_UID} != ${USER_ID} ]; then
+# Update /etc/passwd if we are running with a different UID,
+# only if the UID does not yet already in /etc/passwd.
+if [ ${USER_UID} != ${USER_ID} ] && \
+   ! $(grep -Eq "^[^:]+:[^:]+:${USER_ID}:" /etc/passwd); then
     sed "s@${USER_NAME}:x:\${USER_ID}:@${USER_NAME}:x:${USER_ID}:@g" /etc/passwd.template > /etc/passwd
 fi
 exec "$@"
